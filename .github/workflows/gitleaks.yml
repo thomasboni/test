@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Gitleaks
+      env:
+        IMAGE_TAG: "v8.15.0"
+      run: |
+        docker run --rm -v "$(pwd)":/code -w /code zricethezav/gitleaks:$IMAGE_TAG gitleaks detect -v -r gitleaks-report.json
+      if: always()
+    - name: Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: gitleaks-report
+        path: gitleaks-report.json
